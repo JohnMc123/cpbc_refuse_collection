@@ -121,7 +121,7 @@ class CpbcRefuseCollectionCalendarDataCoordinator(DataUpdateCoordinator):
                         end_datetime = start_datetime + timedelta(days=1)
                         _LOGGER.debug("CPBC collection end_datetime: %s", end_datetime)
                         if start_datetime and end_datetime:
-                            collection_events.append({ "summary": "CPBC Refuse Collection - " + str(collection_class), "description": str(collection_class), "start": start_datetime, "end": end_datetime,})
+                            collection_events.append({ "summary": "CPBC Refuse Collection", "description": str(collection_class), "start": start_datetime, "end": end_datetime,})
                         else:
                             _LOGGER.error(f"Invalid date format: {start_string} to {end_string}")
                 _LOGGER.debug("Events: %s", collection_events)
