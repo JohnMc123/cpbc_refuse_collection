@@ -7,6 +7,7 @@ from homeassistant.util.dt import start_of_local_day, as_utc, parse_datetime
 
 from .const import DOMAIN
 from .calendar import CpbcRefuseCollectionCalendar
+from .sensor import CpbcRefuseCollectionSensor
 
 from bs4 import BeautifulSoup
 import voluptuous as vol
@@ -36,11 +37,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": coordinator,
-        "calendar": CpbcRefuseCollectionCalendar(coordinator)
+        "calendar": CpbcRefuseCollectionCalendar(coordinator),
+        "sensor": CpbcRefuseCollectionSensor(coordinator)
     }
 
-    hass.async_add_job(
+    # Setup calendar
+    hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(entry, "calendar")
+    )
+    # Setup sensor
+    hass.async_create_task(
+        hass.config_entries.async_forward_entry_setup(entry, "sensor")
     )
     return True
 
