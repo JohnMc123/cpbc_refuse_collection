@@ -1,0 +1,9 @@
+{
+  "domain": "cpbc_refuse_collection",
+  "name": "Castle Point Borough Council Refuse Collection Calendar",
+  "config_flow": true,
+  "version": "1.0",
+  "requirements": ["beautifulsoup4", "requests", "voluptuous", "aiohttp"],
+  "dependencies": ["homeassistant"],
+  "codeowners": ["@JohnMc123"]
+}

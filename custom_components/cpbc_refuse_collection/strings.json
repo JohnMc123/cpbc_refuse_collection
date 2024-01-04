@@ -1,0 +1,27 @@
+{
+    "config": {
+        "title": "Castle Point Borough Council Refuse Collection Calendar",
+        "step": {
+            "user": {
+                "title": "Configure CPBC Refuse Collection Calendar"
+            }
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "An unknown error occurred"
+        },
+        "success": {
+            "title": "Setup complete",
+            "content": "CPBC Refuse Collection Calendar is now configured"
+        }
+    },
+    "options": {
+        "title": "Castle Point Borough Council Refuse Collection Calendar Options",
+        "step": {
+            "init": {
+                "title": "Customize your Calendar"
+            }
+        }
+    }
+}
