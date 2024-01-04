@@ -56,9 +56,8 @@ class CpbcRefuseCollectionSensor(Entity):
                 self._state = event["summary"]
                 days_until = (start_time.date() - current_time.date()).days
                 self._attributes = {
-                    "start_time": start_time.isoformat(),
-                    "end_time": event["end"].isoformat(),
-                    "description": event["description"],
+                    "collection_date": start_time.date(),
+                    "collection_type": event["description"],
                     "days_until": days_until
                 }
                 break
