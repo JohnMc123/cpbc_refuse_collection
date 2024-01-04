@@ -104,18 +104,17 @@ class CpbcRefuseCollectionCalendarDataCoordinator(DataUpdateCoordinator):
                     for scheduled_collection in scheduled_collections:
                         _LOGGER.debug("Scheduled collection: %s", scheduled_collection)
                         rex_search = re.search("<td.+?class=\"(?P<class>.+?)\".+?(?P<day>\d+)<.+", str(scheduled_collection))
-                        # collection_class = str(rex_search.group('class'))
+                        # ammend class: normal = black / pink = pink
                         collection_class = ("black", "pink")[str(rex_search.group('class')) == "pink"]
                         collection_days = f"{int(rex_search.group('day')):02d}"
                         start_string = str(collection_year) + "-" + str(collection_month) + "-" + str(collection_days)
                         end_string = str(collection_year) + "-" + str(collection_month) + "-" + str(int(collection_days)+1)
-                        start_datetime = parse_datetime(start_string)
+                        start_datetime = as_utc(start_of_local_day(parse_datetime(start_string)))
                         _LOGGER.debug("CPBC collection start_datetime: %s", start_datetime)
                         end_datetime = start_datetime + timedelta(days=1)
                         _LOGGER.debug("CPBC collection end_datetime: %s", end_datetime)
-                        # ammend class: normal = black / pink = pink
                         if start_datetime and end_datetime:
-                            collection_events.append({ "summary": str(collection_class), "start": as_utc(start_of_local_day(start_datetime)), "end": as_utc(start_of_local_day(end_datetime)),})
+                            collection_events.append({ "summary": "CPBC Refuse Collection - " + str(collection_class), "description": str(collection_class), "start": start_datetime, "end": end_datetime,})
                         else:
                             _LOGGER.error(f"Invalid date format: {start_string} to {end_string}")
                 _LOGGER.debug("Events: %s", collection_events)
