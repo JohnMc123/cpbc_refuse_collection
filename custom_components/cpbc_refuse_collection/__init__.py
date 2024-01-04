@@ -50,7 +50,7 @@ class CpbcRefuseCollectionCalendarDataCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, road_id):
         """Initialize."""
         self.road_id = road_id
-        update_interval = timedelta(minutes=15)  # Update every 15 minutes
+        update_interval = timedelta(days=1)  # Update every 1 day
 
         super().__init__(
             hass,
