@@ -1,0 +1,39 @@
+type: vertical-stack
+cards:
+  - type: horizontal-stack
+    title: 'Next collection:'
+    cards:
+      - type: custom:config-template-card
+        entities:
+          - sensor.cpbc_next_refuse_collection
+        card:
+          type: picture-entity
+          entity: sensor.cpbc_next_refuse_collection
+          name: Next collection
+          show_name: true
+          show_state: false
+          state_image:
+            pink: /local/images/cpbc_refuse_collection/pink.png
+            black: /local/images/cpbc_refuse_collection/black.png
+      - type: vertical-stack
+        cards:
+          - type: tile
+            entity: sensor.cpbc_next_refuse_collection
+            name: Next Collection Date
+            icon: mdi:calendar-check
+            vertical: false
+            show_entity_picture: false
+            hide_state: false
+            state_content: collection_date
+          - type: entity
+            entity: sensor.cpbc_next_refuse_collection
+            attribute: days_until
+            name: Days until next collection
+            unit: day/s
+            state_color: false
+            icon: mdi:camera-timer
+  - type: calendar
+    initial_view: dayGridMonth
+    entities:
+      - calendar.castle_point_refuse_collection_calendar
+    title: 'Collection Calendar:'
