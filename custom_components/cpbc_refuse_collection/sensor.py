@@ -53,11 +53,12 @@ class CpbcRefuseCollectionSensor(Entity):
         for event in events:
             start_time = as_local(event["start"])
             if start_time.date() >= current_time.date():
-                self._state = event["summary"]
+                self._state = event["description"]
                 days_until = (start_time.date() - current_time.date()).days
                 self._attributes = {
                     "collection_date": start_time.date(),
                     "collection_type": event["description"],
-                    "days_until": days_until
+                    "days_until": days_until,
+                    "type": event["summary"]
                 }
                 break
