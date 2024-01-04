@@ -2,7 +2,7 @@ import logging
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
-from homeassistant.util.dt import start_of_local_day, as_utc
+from homeassistant.util.dt import start_of_local_day, as_utc, as_local
 
 from datetime import datetime, timedelta
 from .const import DOMAIN
@@ -55,15 +55,24 @@ class CpbcRefuseCollectionCalendar(CalendarEntity, CoordinatorEntity):
         if self.coordinator.data:
             events = self.coordinator.data.get("events", [])
             _LOGGER.debug("Events data: %s", events)
-            if events:
-                event = events[0]  # Assuming the first event is the next upcoming event
-                _LOGGER.debug("Creating CalendarEvent with summary: %s, start: %s, end: %s", event["summary"], event["start"], event["end"])
+
+            # Find the next upcoming event
+            current_time = as_local(datetime.now())
+            next_event = None
+            for event in events:
+                start_time = as_local(event["start"])
+                if start_time >= current_time:
+                    if next_event is None or start_time < next_event["start"]:
+                        next_event = event
+
+            if next_event:
+                _LOGGER.debug("Next Event: %s", next_event)
                 return CalendarEvent(
-                    summary=event["summary"],
-                    start=event["start"],
-                    end=event["end"],
-                    location=event.get("location", ""),  # Add default if no location
-                    description=event.get("description", "")  # Add default if no description
+                    summary=next_event["summary"],
+                    start=next_event["start"],
+                    end=next_event["end"],
+                    location=next_event.get("location", ""),  # Add default if no location
+                    description=next_event.get("description", "")  # Add default if no description
                 )
         return None
 
