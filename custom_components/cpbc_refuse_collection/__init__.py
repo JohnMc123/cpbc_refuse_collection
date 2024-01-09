@@ -118,7 +118,7 @@ class CpbcRefuseCollectionCalendarDataCoordinator(DataUpdateCoordinator):
                         end_string = str(collection_year) + "-" + str(collection_month) + "-" + str(int(collection_days)+1)
                         start_datetime = as_utc(start_of_local_day(parse_datetime(start_string)))
                         _LOGGER.debug("CPBC collection start_datetime: %s", start_datetime)
-                        end_datetime = start_datetime + timedelta(days=1)
+                        end_datetime = start_datetime + timedelta(hours=13)
                         _LOGGER.debug("CPBC collection end_datetime: %s", end_datetime)
                         if start_datetime and end_datetime:
                             collection_events.append({ "summary": "CPBC Refuse Collection", "description": str(collection_class), "start": start_datetime, "end": end_datetime,})
