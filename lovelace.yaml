@@ -6,10 +6,27 @@ cards:
       - type: custom:config-template-card
         entities:
           - sensor.cpbc_next_refuse_collection
+        variables:
+          COLLECTION: states['sensor.cpbc_next_refuse_collection'].state
+          set_collection_message: |
+            days_until => {
+              if (days_until == 0) {
+                var days = "TODAY: "
+              }
+              else if (days_until == 1) {
+                var days = days_until + " day: "
+              }
+              else if (days_until > 1) {
+                var days = days_until + " days: "
+              }
+              return days;
+            };
+          DAYS_UNTIL: >-
+            states['sensor.cpbc_next_refuse_collection'].attributes['days_until']
         card:
           type: picture-entity
           entity: sensor.cpbc_next_refuse_collection
-          name: Next collection
+          name: ${ set_collection_message(DAYS_UNTIL) + COLLECTION }
           show_name: true
           show_state: false
           state_image:
