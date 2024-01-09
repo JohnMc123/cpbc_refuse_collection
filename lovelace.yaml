@@ -1,56 +1,28 @@
-type: vertical-stack
-cards:
-  - type: horizontal-stack
-    title: 'Next collection:'
-    cards:
-      - type: custom:config-template-card
-        entities:
-          - sensor.cpbc_next_refuse_collection
-        variables:
-          COLLECTION: states['sensor.cpbc_next_refuse_collection'].state
-          set_collection_message: |
-            days_until => {
-              if (days_until == 0) {
-                var days = "TODAY: "
-              }
-              else if (days_until == 1) {
-                var days = days_until + " day: "
-              }
-              else if (days_until > 1) {
-                var days = days_until + " days: "
-              }
-              return days;
-            };
-          DAYS_UNTIL: >-
-            states['sensor.cpbc_next_refuse_collection'].attributes['days_until']
-        card:
-          type: picture-entity
-          entity: sensor.cpbc_next_refuse_collection
-          name: ${ set_collection_message(DAYS_UNTIL) + COLLECTION }
-          show_name: true
-          show_state: false
-          state_image:
-            pink: /local/images/cpbc_refuse_collection/pink.png
-            black: /local/images/cpbc_refuse_collection/black.png
-      - type: vertical-stack
-        cards:
-          - type: tile
-            entity: sensor.cpbc_next_refuse_collection
-            name: Next Collection Date
-            icon: mdi:calendar-check
-            vertical: false
-            show_entity_picture: false
-            hide_state: false
-            state_content: collection_date
-          - type: entity
-            entity: sensor.cpbc_next_refuse_collection
-            attribute: days_until
-            name: Days until next collection
-            unit: day/s
-            state_color: false
-            icon: mdi:camera-timer
-  - type: calendar
-    initial_view: dayGridMonth
-    entities:
-      - calendar.castle_point_refuse_collection_calendar
-    title: 'Collection Calendar:'
+type: custom:config-template-card
+entities:
+  - sensor.cpbc_next_refuse_collection
+variables:
+  COLLECTION: states['sensor.cpbc_next_refuse_collection'].state
+  set_collection_message: |
+    days_until => {
+      if (days_until == 0) {
+        var days = "TODAY: "
+      }
+      else if (days_until == 1) {
+        var days = "TOMORROW: "
+      }
+      else if (days_until > 1) {
+        var days = days_until + " days: "
+      }
+      return days;
+    };
+  DAYS_UNTIL: states['sensor.cpbc_next_refuse_collection'].attributes['days_until']
+card:
+  type: picture-entity
+  entity: sensor.cpbc_next_refuse_collection
+  name: ${ set_collection_message(DAYS_UNTIL) + COLLECTION }
+  show_name: true
+  show_state: false
+  state_image:
+    pink: /local/images/cpbc_refuse_collection/pink.png
+    black: /local/images/cpbc_refuse_collection/black.png
