@@ -4,6 +4,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
+from .common import fetch_road_names_and_ids
 
 import voluptuous as vol
 from aiohttp import ClientSession
@@ -24,7 +25,7 @@ class CpbcRefuseCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             valid = await self._validate_input(user_input)
             if valid:
                 selected_road_id = user_input["road_id"]
-                selected_road_name = next(road_name for road_name, road_id in await self.coordinator._fetch_road_names_and_ids() if road_id == selected_road_id)
+                selected_road_name = next(road_name for road_name, road_id in await fetch_road_names_and_ids() if road_id == selected_road_id)
 
                 # Here, save both the road_id and road_name in the configuration entry
                 return self.async_create_entry(
@@ -35,7 +36,7 @@ class CpbcRefuseCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "invalid_input"
 
         # Fetch road names and IDs from the web page
-        road_names_and_ids = await self.coordinator._fetch_road_names_and_ids()
+        road_names_and_ids = await fetch_road_names_and_ids()
 
         # Schema for the form
         data_schema = vol.Schema({
@@ -57,7 +58,7 @@ class CpbcRefuseCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def _validate_input(self, user_input):
         """Validate user input."""
         road_id = user_input.get("road_id")
-        road_names_and_ids = await self.coordinator._fetch_road_names_and_ids()
+        road_names_and_ids = await fetch_road_names_and_ids()
         if road_id not in [road_id for _, road_id in road_names_and_ids]:
             return False
         return True
@@ -73,14 +74,14 @@ class CpbcRefuseCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         current_road_id = self.config_entry.data.get("road_id")
         if user_input is not None:
             selected_road_name = user_input.get("road_id")
-            new_road_id, new_road_name = next((road_id, road_name) for road_name, road_id in await self.coordinator_fetch_road_names_and_ids() if road_name == selected_road_name)
+            new_road_id, new_road_name = next((road_id, road_name) for road_name, road_id in await fetch_road_names_and_ids() if road_name == selected_road_name)
             if current_road_id != new_road_id:
                 # Update both road_id and road_name
                 return self.async_create_entry(title="", data={"road_id": new_road_id, "road_name": new_road_name})
             # No change, return without creating a new entry
             return self.async_abort(reason="road_id unchanged")
         # Fetch road names and IDs from the web page
-        road_names_and_ids = await self.coordinator._fetch_road_names_and_ids()
+        road_names_and_ids = await fetch_road_names_and_ids()
         _LOGGER.debug("Showing options form with data: %s", road_names_and_ids)
         return self.async_show_form(
             step_id="options",
