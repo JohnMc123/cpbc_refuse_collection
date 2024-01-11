@@ -23,10 +23,13 @@ class CpbcRefuseCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             # Validation or processing of user input
             valid = await self._validate_input(user_input)
             if valid:
-                # Here, only save the road_id in the configuration entry
+                selected_road_id = user_input["road_id"]
+                selected_road_name = next(road_name for road_name, road_id in await self._fetch_road_names_and_ids() if road_id == selected_road_id)
+
+                # Here, save both the road_id and road_name in the configuration entry
                 return self.async_create_entry(
                     title="Castle Point Borough Council Refuse Collection Calendar",
-                    data={"road_id": user_input["road_id"]}
+                    data={"road_id": selected_road_id, "road_name": selected_road_name}
                 )
             else:
                 errors["base"] = "invalid_input"
@@ -64,37 +67,20 @@ class CpbcRefuseCalendarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry):
         return CpbcRefuseCollectionCalendarOptionsFlow(config_entry)
     
-    async def _fetch_road_names_and_ids(self):
-        """Fetch road names and IDs from the web page."""
-        url = 'https://apps.castlepoint.gov.uk/cpapps/index.cfm?fa=wastecalendar' 
-        async with ClientSession() as session:
-            async with session.get(url) as response:
-                data = await response.text() 
-        soup = BeautifulSoup(data, 'html.parser')
-        road_options = soup.find("select",{"name":"roadID"}).findAll("option")
-        road_names_and_ids = []
-        for road in road_options:
-            road_name = road.text
-            road_id = road["value"]
-            road_names_and_ids.append((road_name, road_id))
-        return road_names_and_ids
-    
     async def async_step_options(self, user_input=None):
         """Handle options."""
         _LOGGER.debug("User input for options: %s", user_input)
         current_road_id = self.config_entry.data.get("road_id")
         if user_input is not None:
             selected_road_name = user_input.get("road_id")
-            new_road_id = next(item[1] for item in await self._fetch_road_names_and_ids() if item[0] == selected_road_name)
-            _LOGGER.debug("ROAD ID: %s", new_road_id)
-             
+            new_road_id, new_road_name = next((road_id, road_name) for road_name, road_id in await self._fetch_road_names_and_ids() if road_name == selected_road_name)
             if current_road_id != new_road_id:
-                # Only update if there's a change
-                return self.async_create_entry(title="", data={"road_id": new_road_id})
+                # Update both road_id and road_name
+                return self.async_create_entry(title="", data={"road_id": new_road_id, "road_name": new_road_name})
             # No change, return without creating a new entry
             return self.async_abort(reason="road_id unchanged")
         # Fetch road names and IDs from the web page
-        road_names_and_ids = await self._fetch_road_names_and_ids()
+        road_names_and_ids = await self.coordinator._fetch_road_names_and_ids()
         _LOGGER.debug("Showing options form with data: %s", road_names_and_ids)
         return self.async_show_form(
             step_id="options",
